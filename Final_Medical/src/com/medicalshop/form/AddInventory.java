@@ -108,7 +108,7 @@ public class AddInventory extends JInternalFrame {
 		this.ptype = new JComboBox<>();
 		Connection conn1 = this.database.getConnection();
 		try {
-			PreparedStatement ps1 = conn1.prepareStatement("select * from  stock_type;");
+			PreparedStatement ps1 = conn1.prepareStatement("select * from  stock_type WHERE status ='Active' ");
 			ResultSet rs1 = ps1.executeQuery();
 			while (rs1.next())
 				this.ptype.addItem(rs1.getString("stock_type_name"));

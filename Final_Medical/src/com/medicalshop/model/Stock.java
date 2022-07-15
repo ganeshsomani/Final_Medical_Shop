@@ -30,7 +30,7 @@ public class Stock {
 						+ " PRIMARY KEY ( stock_id )," + " stock_no VARCHAR(255) NOT NULL UNIQUE,"
 						+ "status VARCHAR(255)," + "avail_stock DOUBLE ," + " avail_tab DOUBLE ,"
 						+ "buy_price DOUBLE  ," + "gst_per DOUBLE ," + "gst_amt DOUBLE ,"
-						+ " sell_price DOUBLE ," + "price_tab DOUBLE ," + "created_at datetime default now(),"
+						+ " sell_price DOUBLE ," + "price_tab DOUBLE ," + "buy_price_tab DOUBLE ," + "created_at datetime default now(),"
 						+ "update_at datetime default now()," + "" + "inv_id bigint NOT NULL,"
 						+ " CONSTRAINT inv_id FOREIGN KEY (inv_id)  REFERENCES inventory(inv_id))";
 				stmt.executeUpdate(sql);
@@ -38,7 +38,7 @@ public class Stock {
 				System.out.println("Table exists");
 			}
 			@SuppressWarnings("unused")
-			Billing bill = new Billing();
+			StockDealer stdealer = new StockDealer();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

@@ -101,7 +101,7 @@ public class AddStock extends JInternalFrame {
 		setBounds(100, 100, 1375, 729);
 		getContentPane().setLayout(null);
 		JComboBox<String> invName = new JComboBox<String>();
-		invName.setBounds(233, 72, 235, 33);
+		invName.setBounds(211, 72, 235, 33);
 		invName.addItem("Select Medicine");
 		getContentPane().add(invName);
 
@@ -130,18 +130,18 @@ public class AddStock extends JInternalFrame {
 		getContentPane().add(sellprice);
 
 		pQut = new JTextField();
-		pQut.setBounds(233, 220, 237, 33);
+		pQut.setBounds(211, 220, 237, 33);
 		getContentPane().add(pQut);
 		pQut.setColumns(10);
 
 		b_prize = new JTextField();
 		b_prize.setColumns(10);
-		b_prize.setBounds(233, 268, 237, 33);
+		b_prize.setBounds(211, 268, 237, 33);
 		getContentPane().add(b_prize);
 
 		s_price = new JTextField();
 		s_price.setColumns(10);
-		s_price.setBounds(233, 324, 237, 33);
+		s_price.setBounds(211, 324, 237, 33);
 		getContentPane().add(s_price);
 
 		JButton submits = new JButton("Submit");
@@ -152,7 +152,7 @@ public class AddStock extends JInternalFrame {
 		JComboBox<String> statusdd = new JComboBox<String>();
 		statusdd.addItem("Active");
 		statusdd.addItem("Inactve");
-		statusdd.setBounds(233, 482, 237, 33);
+		statusdd.setBounds(211, 496, 235, 33);
 		getContentPane().add(statusdd);
 
 		JLabel gst_per = new JLabel("GST Percentage");
@@ -187,6 +187,8 @@ public class AddStock extends JInternalFrame {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				g_amt.setText("");
+				g_per.setText("");
 				DefaultTableModel tmodel = (DefaultTableModel) table.getModel();
 				int selectedRow = table.getSelectedRow();
 				int modelRow = table.convertRowIndexToModel(selectedRow);
@@ -202,8 +204,8 @@ public class AddStock extends JInternalFrame {
 				pQut.setText(ac);
 				b_prize.setText(tmodel.getValueAt(modelRow, 4).toString());
 				s_price.setText(tmodel.getValueAt(modelRow, 5).toString());
-				g_per.setText(tmodel.getValueAt(modelRow, 7).toString());
-				g_amt.setText(tmodel.getValueAt(modelRow, 8).toString());
+				// g_per.setText(tmodel.getValueAt(modelRow, 7).toString());
+				// g_amt.setText(tmodel.getValueAt(modelRow, 8).toString());
 				del_name.setSelectedIndex(0);
 //				System.out.println(pro_no);
 
@@ -241,12 +243,12 @@ public class AddStock extends JInternalFrame {
 			}
 		});
 		g_per.setColumns(10);
-		g_per.setBounds(233, 378, 237, 33);
+		g_per.setBounds(211, 378, 237, 33);
 		getContentPane().add(g_per);
 
 		g_amt = new JTextField();
 		g_amt.setColumns(10);
-		g_amt.setBounds(234, 429, 236, 33);
+		g_amt.setBounds(211, 438, 236, 33);
 		g_amt.setEditable(false);
 		g_amt.setFont(new Font("Tahoma", Font.BOLD, 11));
 		g_amt.setBackground(Color.WHITE);
@@ -255,13 +257,13 @@ public class AddStock extends JInternalFrame {
 		JLabel lblGstAmt = new JLabel("GST amt.");
 		lblGstAmt.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblGstAmt.setFont(new Font("Times New Roman", Font.BOLD, 14));
-		lblGstAmt.setBounds(55, 432, 109, 24);
+		lblGstAmt.setBounds(55, 441, 109, 24);
 		getContentPane().add(lblGstAmt);
 
 		JLabel status = new JLabel("Status");
 		status.setHorizontalAlignment(SwingConstants.RIGHT);
 		status.setFont(new Font("Times New Roman", Font.BOLD, 14));
-		status.setBounds(55, 485, 109, 24);
+		status.setBounds(55, 499, 109, 24);
 		getContentPane().add(status);
 
 		JLabel proError = new JLabel("");
@@ -310,7 +312,7 @@ public class AddStock extends JInternalFrame {
 		inv_type_head.setBounds(449, 16, 111, 38);
 		getContentPane().add(inv_type_head);
 
-		del_name.setBounds(233, 125, 236, 33);
+		del_name.setBounds(211, 125, 236, 33);
 		del_name.addItem("Select Dealer");
 		getContentPane().add(del_name);
 		Connection conn2 = database.getConnection();
@@ -348,6 +350,10 @@ public class AddStock extends JInternalFrame {
 		JLabel delNameError = new JLabel("");
 		delNameError.setBounds(233, 157, 235, 14);
 		getContentPane().add(delNameError);
+		
+		JLabel pstripQut = new JLabel("");
+		pstripQut.setBounds(449, 72, 81, 33);
+		getContentPane().add(pstripQut);
 		Connection conn1 = database.getConnection();
 		PreparedStatement ps1;
 		try {
@@ -366,6 +372,7 @@ public class AddStock extends JInternalFrame {
 						ResultSet rs2 = ps2.executeQuery();
 						while (rs2.next()) {
 							packSize = rs2.getString("pack_size");
+							pstripQut.setText(packSize+" Pack Size");
 						}
 					} catch (SQLException e1) {
 
@@ -407,14 +414,14 @@ public class AddStock extends JInternalFrame {
 							} else if (s_price.getText().equals("")) {
 								sPError.setText("Please enter Sell Price");
 							} else if (g_per.getText().equals("")) {
-								GpError.setText("Please enter product status");
+								GpError.setText("Please enter GST percentage");
 							} else if (g_amt.getText().equals("")) {
-								GaError.setText("Please enter product status");
+								GaError.setText("Please enter GST amount");
 							} else if (del_name.getSelectedIndex() == 0) {
 								delNameError.setText("Please enter Dealer Name");
 							} else {
-								int number = 0000001;
-								int dnumber = 0000000001;
+								String number = "0000001";
+								String dnumber = "0000000001";
 								ps4 = con.prepareStatement(
 										"select stock_no from stock ORDER BY stock_no DESC LIMIT 0,1");
 								ResultSet rs4 = ps4.executeQuery();
@@ -436,7 +443,8 @@ public class AddStock extends JInternalFrame {
 								} else {
 
 								}
-								ps6 = con.prepareStatement("select del_no from stock ORDER BY del_no DESC LIMIT 0,1");
+								ps6 = con.prepareStatement(
+										"select del_no from stockdealer ORDER BY del_no DESC LIMIT 0,1");
 								ResultSet rs6 = ps6.executeQuery();
 								while (rs6.next()) {
 									dNumbers = rs6.getString("del_no");
@@ -455,17 +463,19 @@ public class AddStock extends JInternalFrame {
 								String bprices = b_prize.getText();
 								String sprices = s_price.getText();
 								Double ppertab = Double.parseDouble(s_price.getText()) / Double.parseDouble(packSize);
+								Double buyppertab = Double.parseDouble(b_prize.getText())
+										/ Double.parseDouble(packSize);
 								Double atab = Double.parseDouble(pQut.getText()) * Double.parseDouble(packSize);
 								String pergst = g_per.getText();
 								String amtgst = g_amt.getText();
 								Double tot = Double.parseDouble(pQut.getText()) * Double.parseDouble(bprices);
 								ps = con.prepareStatement(
-										"insert into stock(stock_no,avail_stock,avail_tab,buy_price,sell_price,price_tab,status,gst_per,gst_amt,inv_id)values ('"
+										"insert into stock(stock_no,avail_stock,avail_tab,buy_price,sell_price,price_tab,status,gst_per,gst_amt,buy_price_tab,inv_id)values ('"
 												+ stcno + "','" + pqut + "','" + atab + "','" + bprices + "','"
 												+ sprices + "','" + ppertab + "','" + selected_status + "' , '" + pergst
-												+ "','" + amtgst
-												+ "',(select inv_id from inventory where inv_name  =  '" + selected_text
-												+ "' ))");
+												+ "','" + amtgst + "','" + buyppertab
+												+ "' ,(select inv_id from inventory where inv_name  =  '"
+												+ selected_text + "' ))");
 								statuss = ps.executeUpdate();
 								ps3 = con.prepareStatement(
 										"insert into stockdealer(buy_stock,buy_price,total,gst_per,gst_amt,del_name,del_no,inv_ids)values ('"
@@ -492,7 +502,7 @@ public class AddStock extends JInternalFrame {
 							count = 0;
 						}
 					} else {
-						int dnumber = 0000000001;
+						String dnumber = "0000000001";
 						ps1 = con.prepareStatement("select inv_id,inv_name from inventory WHERE inv_name='"
 								+ invName.getItemAt(invName.getSelectedIndex()) + "'");
 						ResultSet rs1 = ps1.executeQuery();
@@ -514,7 +524,7 @@ public class AddStock extends JInternalFrame {
 						} else {
 							dnme = (String) del_name.getSelectedItem();
 						}
-						ps6 = con.prepareStatement("select del_no from stock ORDER BY del_no DESC LIMIT 0,1");
+						ps6 = con.prepareStatement("select del_no from stockdealer ORDER BY del_no DESC LIMIT 0,1");
 						ResultSet rs6 = ps6.executeQuery();
 						while (rs6.next()) {
 							dNumbers = rs6.getString("del_no");
@@ -536,9 +546,9 @@ public class AddStock extends JInternalFrame {
 							} else if (s_price.getText().equals("")) {
 								sPError.setText("Please enter Sell Price");
 							} else if (g_per.getText().equals("")) {
-								GpError.setText("Please enter product status");
+								GpError.setText("Please enter GST percentage");
 							} else if (g_amt.getText().equals("")) {
-								GaError.setText("Please enter product status");
+								GaError.setText("Please enter GST amount");
 							} else if (del_name.getSelectedIndex() == 0) {
 								delNameError.setText("Please enter Dealer Name");
 							} else {
@@ -551,6 +561,8 @@ public class AddStock extends JInternalFrame {
 								String bprices = b_prize.getText();
 								String sprices = s_price.getText();
 								Double ppertab = Double.parseDouble(s_price.getText()) / Double.parseDouble(packSize);
+								Double buyppertab = Double.parseDouble(b_prize.getText())
+										/ Double.parseDouble(packSize);
 								Double atab = pqutFinal * Double.parseDouble(packSize);
 								String pergst = g_per.getText();
 								String amtgst = g_amt.getText();
@@ -559,14 +571,15 @@ public class AddStock extends JInternalFrame {
 										+ pqut + "',avail_tab='" + atab + "',buy_price='" + bprices + "'"
 										+ ",sell_price='" + sprices + "',price_tab='" + ppertab + "',status='"
 										+ selected_status + "',gst_per='" + pergst + "',gst_amt='" + amtgst
+										+ "',buy_price_tab='" + buyppertab
 										+ "',inv_id = (select inv_id from inventory where inv_name  = '" + selected_text
 										+ "') where stock_no ='" + pro_no + "' ");
 								statuss = ps.executeUpdate();
 
 								ps5 = con.prepareStatement(
-										"insert into stockdealer(buy_stock,buy_price,total,gst_per,gst_amt,del_name,inv_ids)values ('"
+										"insert into stockdealer(buy_stock,buy_price,total,gst_per,gst_amt,del_name,del_no,inv_ids)values ('"
 												+ pQut.getText() + "','" + bprices + "','" + tot1 + "','" + pergst
-												+ "','" + amtgst + "','" + dnme
+												+ "','" + amtgst + "','" + dnme + "', '" + delNo
 												+ "',(select inv_id from inventory where inv_name  =  '" + selected_text
 												+ "' ))");
 								statuss = ps5.executeUpdate();

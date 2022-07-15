@@ -65,7 +65,7 @@ public class Billing extends JInternalFrame {
 	String selected_text = "", pnos, invno, times;
 	Double disPr = 0.0;
 	Double availTabs, atabs = 0.0, aStocks = 0.0;
-	Double buyPrice;
+	Double buyPrices;
 	Double fTotal = 0.0;
 	Double priceTabs = 0.0;
 	Double finalpriceTabs = 0.0;
@@ -80,6 +80,7 @@ public class Billing extends JInternalFrame {
 	static int openFrameCount = 0;
 	final int xOffset = 30, yOffset = 30;
 	String dia = "dialogue";
+	private JTextField buyprice;
 
 	/**
 	 * Launch the application.
@@ -173,23 +174,26 @@ public class Billing extends JInternalFrame {
 							}
 						}
 						ps2 = conn1.prepareStatement(
-								"select price_tab,avail_stock,avail_tab from  stock WHERE STATUS = 'Active' AND inv_id='"
+								"select price_tab,avail_stock,avail_tab,buy_price_tab from  stock WHERE STATUS = 'Active' AND inv_id='"
 										+ invid + "'");
 						ResultSet rs2 = ps2.executeQuery();
 						while (rs2.next()) {
 							priceTabs = rs2.getDouble("price_tab");
 							aStocks = rs2.getDouble("avail_stock");
 							atabs = rs2.getDouble("avail_tab");
+							buyPrices = rs2.getDouble("buy_price_tab");
 						}
 						if (atabs != 0 && aStocks != 0) {
 							price.setEditable(true);
 							quantity.setEditable(true);
 							if (priceTabs != 0) {
 								price.setText(Double.toString(priceTabs));
+								buyprice.setText(Double.toString(buyPrices));
 								finalpriceTabs = priceTabs;
 								priceTabs = 0.0;
 								aStocks = 0.0;
 								atabs = 0.0;
+								buyPrices = 0.0;
 							} else {
 								price.setText("0");
 							}
@@ -335,36 +339,49 @@ public class Billing extends JInternalFrame {
 		scrollPane.setBounds(10, 213, 1149, 162);
 		getContentPane().add(scrollPane);
 
+		buyprice = new JTextField();
+		buyprice.setEnabled(false);
+		buyprice.setVisible(false);
+		buyprice.setFont(new Font("Tahoma", Font.BOLD, 11));
+		buyprice.setEditable(false);
+		buyprice.setColumns(10);
+		buyprice.setBackground(Color.WHITE);
+		buyprice.setBounds(862, 188, 95, 21);
+		getContentPane().add(buyprice);
+
 		table = new JTable();
-		try {
-			table.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					tmodel = (DefaultTableModel) table.getModel();
-					int selectedRow = table.getSelectedRow();
-					int modelRow = table.convertRowIndexToModel(selectedRow);
-					pnos = tmodel.getValueAt(modelRow, 0).toString();
-					tabName.setSelectedItem(tmodel.getValueAt(modelRow, 1).toString());
-					price.setText(tmodel.getValueAt(modelRow, 2).toString());
-					quantity.setText(tmodel.getValueAt(modelRow, 3).toString());
-					Total.setText(tmodel.getValueAt(modelRow, 4).toString());
-					// System.out.println("Table Data==" + tmodel.getRowCount());
-				}
-			});
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			table.addMouseListener(new MouseAdapter() {
+//				@Override
+//				public void mouseClicked(MouseEvent e) {
+//					tmodel = (DefaultTableModel) table.getModel();
+//					int selectedRow = table.getSelectedRow();
+//					int modelRow = table.convertRowIndexToModel(selectedRow);
+//					pnos = tmodel.getValueAt(modelRow, 0).toString();
+//					tabName.setSelectedItem(tmodel.getValueAt(modelRow, 1).toString());
+//					price.setText(tmodel.getValueAt(modelRow, 2).toString());
+//					quantity.setText(tmodel.getValueAt(modelRow, 3).toString());
+//					Total.setText(tmodel.getValueAt(modelRow, 4).toString());
+//					// System.out.println("Table Data==" + tmodel.getRowCount());
+//				}
+//			});
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		table.setDefaultEditor(Object.class, null);
 		table.setRowHeight(table.getRowHeight() + 10);
 		table.setBackground(Color.WHITE);
 		model = new DefaultTableModel();
-		Object[] Column = { "Sr.No", "Medicine", "Price", "Quantity", "Total" };
+		Object[] Column = { "Sr.No", "Medicine", "Price", "Quantity", "Total", "BPrice" };
 		table.getTableHeader().setBackground(Color.GREEN);
 		table.getTableHeader().setPreferredSize(new Dimension(100, 32));
 		Font headerFont = new Font("Times New Roman", Font.BOLD, 16);
 		table.getTableHeader().setFont(headerFont);
 		model.setColumnIdentifiers(Column);
 		table.setModel(model);
+		table.getColumnModel().getColumn(5).setMinWidth(0);
+		table.getColumnModel().getColumn(5).setMaxWidth(0);
+		table.getColumnModel().getColumn(5).setWidth(0);
 		scrollPane.setViewportView(table);
 
 		JButton add_button = new JButton("Add");
@@ -387,7 +404,8 @@ public class Billing extends JInternalFrame {
 						String prc = price.getText();
 						String qut = quantity.getText();
 						String tot = Total.getText();
-						model.addRow(new Object[] { id, med, prc, qut, tot });
+						String bpri = buyprice.getText();
+						model.addRow(new Object[] { id, med, prc, qut, tot, bpri });
 						sums = 0.0;
 						price.setText("");
 						quantity.setText("");
@@ -532,7 +550,7 @@ public class Billing extends JInternalFrame {
 		save_button.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				dia=null;
+				dia = null;
 				Connection con = database.getConnection();
 				PreparedStatement ps, ps1, ps2, ps3, ps4, ps5;
 				int inid;
@@ -546,12 +564,11 @@ public class Billing extends JInternalFrame {
 					String t = dtf.format(now);
 					times = formatter.format(dateChooser.getDate()) + " " + t;
 					// System.out.println("Mouse Updated new==" + times);
-					int number = 0000000001;
+					String number = "0000000001";
 					ps = con.prepareStatement("select bill_no from billing ORDER BY bill_no DESC LIMIT 0,1");
 					ResultSet rs = ps.executeQuery();
 					while (rs.next()) {
 						inumber = rs.getString("bill_no");
-
 					}
 					if (inumber != null) {
 						String abc = String.format("%010d", Integer.parseInt(inumber.substring(1, 11)) + 1);
@@ -587,9 +604,11 @@ public class Billing extends JInternalFrame {
 							String p = tmodel.getValueAt(i, 2).toString();
 							String q = tmodel.getValueAt(i, 3).toString();
 							String ts = tmodel.getValueAt(i, 4).toString();
+							String bpr = tmodel.getValueAt(i, 5).toString();
+							System.out.println(bpr);
 							ps2 = con.prepareStatement(
-									"insert into billmedicine(medicine_name,mprice,quantity,total,bill_id)values ('" + n
-											+ "','" + p + "','" + q + "','" + ts
+									"insert into billmedicine(medicine_name,mprice,quantity,total,buyprice,bill_id)values ('"
+											+ n + "','" + p + "','" + q + "','" + ts + "','" + bpr
 											+ "',(select bill_id from billing where bill_no  = '" + invno + "' ))");
 							statuss = ps2.executeUpdate();
 
@@ -615,10 +634,10 @@ public class Billing extends JInternalFrame {
 											+ "',avail_stock='" + rstock + "',avail_tab='" + rtab + "',inv_id = '"
 											+ inid + "' where stock_no ='" + stocNo + "' ");
 									statuss = ps5.executeUpdate();
-									System.out.println("Avail Stock=" + aStock);
-									System.out.println("Avail tab=" + aStock);
-									System.out.println("Re Stock =" + rstock);
-									System.out.println("Re Tab=" + rtab);
+//									System.out.println("Avail Stock=" + aStock);
+//									System.out.println("Avail tab=" + aStock);
+//									System.out.println("Re Stock =" + rstock);
+//									System.out.println("Re Tab=" + rtab);
 
 								}
 							}
@@ -653,7 +672,7 @@ public class Billing extends JInternalFrame {
 		print_button.setFont(new Font("Times New Roman", Font.BOLD, 16));
 		print_button.setBounds(1169, 479, 104, 27);
 		getContentPane().add(print_button);
-		
+
 		JLabel inv_type_head = new JLabel("Billing");
 		inv_type_head.setForeground(Color.MAGENTA);
 		inv_type_head.setFont(new Font("Times New Roman", Font.BOLD, 26));

@@ -82,8 +82,8 @@ public class Menu {
 //				frame.setVisible(true);
 				// tes.setBounds(100, 100, 624, 355);
 				if (e.getSource() == frame) {
-//					int fheight = frame.getContentPane().getHeight() - menuBar.getHeight();
-//					tes.setBounds(0, 40, frame.getContentPane().getWidth(), fheight);
+					int fheight = frame.getContentPane().getHeight() - menuBar.getHeight();
+					tes.setBounds(0, 40, frame.getContentPane().getWidth(), fheight);
 //					adds.setBounds(0, 40, frame.getContentPane().getWidth(), fheight);
 //					addInv.setBounds(0, 40, frame.getContentPane().getWidth(), fheight);
 //					asto.setBounds(0, 40, frame.getContentPane().getWidth(), fheight);

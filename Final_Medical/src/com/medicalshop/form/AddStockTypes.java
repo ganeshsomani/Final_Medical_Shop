@@ -16,6 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.awt.Color;
+import java.awt.Dimension;
+
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
@@ -37,10 +39,11 @@ public class AddStockTypes extends JInternalFrame {
 	private JLabel status;
 	DatabaseConnection database = new DatabaseConnection();
 	int statuss = 0;
-	int count = 0;
+	int count = 0,tid;
 	DefaultTableModel model;
 	private JTable table;
 	String pnos = new String();
+	String tname;
 	private JButton Clear;
 	JLabel inv_type_err = null;
 	static int openFrameCount = 0;
@@ -108,7 +111,7 @@ public class AddStockTypes extends JInternalFrame {
 				DefaultTableModel tmodel = (DefaultTableModel) table.getModel();
 				int selectedRow = table.getSelectedRow();
 				int modelRow = table.convertRowIndexToModel(selectedRow);
-				pnos = tmodel.getValueAt(modelRow, 1).toString();
+				pnos = tmodel.getValueAt(modelRow, 0).toString();
 				inv_type.setText(tmodel.getValueAt(modelRow, 1).toString());
 				sel_status.setSelectedItem(tmodel.getValueAt(modelRow, 2).toString());
 				// System.out.println(pnos);
@@ -117,6 +120,10 @@ public class AddStockTypes extends JInternalFrame {
 		table.setDefaultEditor(Object.class, null);
 		table.setRowHeight(table.getRowHeight() + 10);
 		table.setBackground(new Color(255, 250, 250));
+		table.getTableHeader().setBackground(Color.GREEN);
+		table.getTableHeader().setPreferredSize(new Dimension(100, 32));
+		Font headerFont = new Font("Times New Roman", Font.BOLD, 16);
+		table.getTableHeader().setFont(headerFont);
 		scrollPane.setViewportView(table);
 		model = new DefaultTableModel();
 		Object[] Column = { "Sr.No", "Stock Type Name", "Status" };
@@ -134,7 +141,7 @@ public class AddStockTypes extends JInternalFrame {
 		});
 		sel_status.setBackground(Color.WHITE);
 		sel_status.setFont(new Font("Times New Roman", Font.PLAIN, 16));
-		sel_status.setBounds(211, 195, 305, 22);
+		sel_status.setBounds(211, 195, 305, 28);
 
 		getContentPane().add(sel_status);
 		status = new JLabel("Status");
@@ -175,21 +182,25 @@ public class AddStockTypes extends JInternalFrame {
 						}
 					} else {
 						ps1 = con.prepareStatement(
-								"select COUNT(type_id) AS counts from stock_type WHERE stock_type_name ='"
+								"select type_id,stock_type_name from stock_type WHERE stock_type_name ='"
 										+ invertory_type + "'");
 						ResultSet rs1 = ps1.executeQuery();
 						while (rs1.next()) {
-							count = rs1.getInt("counts");
+							tid = rs1.getInt("type_id");
+							tname = rs1.getString("stock_type_name");
 						}
 
 						if (inv_type.getText().equals("")) {
 							inv_type_err.setText("Please enter Stock Type");
-						} else if (count == 0) {
+						} else if (tid == Integer.parseInt(pnos)) {
 							ps = con.prepareStatement("UPDATE stock_type SET stock_type_name='" + invertory_type
-									+ "',status = '" + selected_text + "'where stock_type_name = '" + pnos + "'");
+									+ "',status = '" + sel_status.getSelectedItem() + "'where type_id = '" + pnos + "'");
 							statuss = ps.executeUpdate();
 							invTable();
 							con.close();
+							tid = 0;
+							tname =null;
+							
 
 						} else {
 							JOptionPane.showMessageDialog(null, "Stock type already added");
@@ -238,12 +249,12 @@ public class AddStockTypes extends JInternalFrame {
 			ResultSet rs = ps.executeQuery();
 			int id = 0;
 			while (rs.next()) {
-				id = id + 1;
-				// int ids = rs.getInt("type_id");
+				//id = id + 1;
+				int ids = rs.getInt("type_id");
 				String st_name = rs.getString("stock_type_name");
 				String stat = rs.getString("status");
 				// Date cdate = rs.getDate("created_at");
-				model.addRow(new Object[] { id, st_name, stat });
+				model.addRow(new Object[] { ids, st_name, stat });
 			}
 			// Object row = new Object(rs);
 			// table.setModel(DbUtils.resultSetToTableModel(rs));
